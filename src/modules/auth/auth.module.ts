@@ -4,6 +4,7 @@ import { AuthController } from './auth.controller';
 import { PrismaService } from '../../prisma.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { jwtConfig } from '../../config/jwt.config';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { jwtConfig } from '../../config/jwt.config';
         expiresIn: jwtConfig.expiresIn,
       },
     }),
+    UsersModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, PrismaService],

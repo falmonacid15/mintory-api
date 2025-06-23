@@ -15,6 +15,94 @@ model User {
   lastName  String
   avatar    String? @default("")
 
+  transactions Transaction[]
+  categories   Category[]
+  budgets      Budget[]
+  goals        Goal[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Transaction {
+  id     String          @id @default(uuid())
+  type   TransactionType
+  amount Decimal         @db.Decimal(10, 2)
+  note   String?
+  date   DateTime
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id    String @id @default(uuid())
+  name  String
+  icon  String
+  color String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  transactions Transaction[]
+  budgets      Budget[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Budget {
+  id    String  @id @default(uuid())
+  month Month
+  year  Int
+  limit Decimal @db.Decimal(10, 2)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Goal {
+  id       String    @id @default(uuid())
+  title    String
+  target   Decimal   @db.Decimal(10, 2)
+  current  Decimal   @default(0.0) @db.Decimal(10, 2)
+  deadline DateTime?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum Month {
+  JANUARY
+  FEBRUARY
+  MARCH
+  APRIL
+  MAY
+  JUNE
+  JULY
+  AUGUST
+  SEPTEMBER
+  OCTOBER
+  NOVEMBER
+  DECEMBER
 }

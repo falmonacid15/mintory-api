@@ -9,20 +9,18 @@ import { comparePassword, hashPassword } from '../../utils/password';
 import { generatePayload } from '../../utils/payload';
 
 import { AuthResponse } from '../../types/responses/auth.response';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly userService: UsersService,
   ) {}
 
   async login(data: LoginDto): Promise<AuthResponse> {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        email: data.email,
-      },
-    });
+    const user = await this.userService.findOne({ email: data.email });
 
     if (!user) {
       throw new UnauthorizedException('Credenciales inválidas');
@@ -46,11 +44,7 @@ export class AuthService {
   }
 
   async register(data: RegisterDto): Promise<AuthResponse> {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        email: data.email,
-      },
-    });
+    const user = await this.userService.findOne({ email: data.email });
 
     if (user) {
       throw new UnauthorizedException('Este usuario ya existe');
@@ -58,11 +52,9 @@ export class AuthService {
 
     data.password = await hashPassword(data.password);
 
-    const newUser = await this.prisma.user.create({
-      data,
-    });
+    const newUser = await this.userService.create(data);
 
-    const payload = await generatePayload(newUser);
+    const payload = await generatePayload(newUser.data);
 
     const accessToken = this.jwtService.sign(payload);
 
