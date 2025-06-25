@@ -3,10 +3,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../../prisma.service';
 import { hashPassword } from '../../utils/password';
-import { CrudResponse } from 'src/types/responses/crud.response';
+import { CrudResponse } from '../../types/responses/crud.response';
 import { Prisma, User } from '@prisma/client';
 import { PaginatedResponse } from '../../types/responses/paginated.response';
-import { pagination } from 'prisma-extension-pagination';
 
 @Injectable()
 export class UsersService {

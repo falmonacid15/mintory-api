@@ -10,6 +10,10 @@ import { generatePayload } from '../../utils/payload';
 
 import { AuthResponse } from '../../types/responses/auth.response';
 import { UsersService } from '../users/users.service';
+import { DEFAULT_CATEGORIES } from 'src/constants/default-data';
+import { CategoriesService } from '../categories/categories.service';
+import { CreateCategoryDto } from '../categories/dto/create-category.dto';
+import { Category, TransactionType } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +21,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly userService: UsersService,
+    private readonly categoriesService: CategoriesService,
   ) {}
 
   async login(data: LoginDto): Promise<AuthResponse> {
@@ -53,6 +58,13 @@ export class AuthService {
     data.password = await hashPassword(data.password);
 
     const newUser = await this.userService.create(data);
+
+    const categoriesToCreate = DEFAULT_CATEGORIES.map((category) => ({
+      ...category,
+      userId: newUser.data.id,
+    }));
+
+    await this.categoriesService.createMany(categoriesToCreate);
 
     const payload = await generatePayload(newUser.data);
 
